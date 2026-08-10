@@ -31,7 +31,7 @@ jobs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@c49702b4b60877693339e3369e1c4ea8ad3522b3
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@af10ab75b6181b2803f051f802a5eff37bdbbe1b
         with:
           shell: powershell
 
@@ -42,13 +42,13 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@c49702b4b60877693339e3369e1c4ea8ad3522b3
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@af10ab75b6181b2803f051f802a5eff37bdbbe1b
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@c49702b4b60877693339e3369e1c4ea8ad3522b3
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@af10ab75b6181b2803f051f802a5eff37bdbbe1b
         with:
           shell: powershell
           get: useGitSubmodules,shortLivedArtifactsRetentionDays
@@ -56,7 +56,7 @@ jobs:
       - name: Read submodules token
         id: ReadSubmodulesToken
         if: env.useGitSubmodules != 'false' && env.useGitSubmodules != ''
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@c49702b4b60877693339e3369e1c4ea8ad3522b3
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@af10ab75b6181b2803f051f802a5eff37bdbbe1b
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -78,7 +78,7 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@c49702b4b60877693339e3369e1c4ea8ad3522b3
+        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@af10ab75b6181b2803f051f802a5eff37bdbbe1b
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
@@ -115,7 +115,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@c49702b4b60877693339e3369e1c4ea8ad3522b3
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@af10ab75b6181b2803f051f802a5eff37bdbbe1b
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
