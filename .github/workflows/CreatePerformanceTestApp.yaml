@@ -57,7 +57,7 @@ jobs:
     runs-on: [ windows-latest ]
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@af10ab75b6181b2803f051f802a5eff37bdbbe1b
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@6ccd41a989923f0db6108aea333c62d3fb8dedc1
         with:
           shell: powershell
 
@@ -66,18 +66,18 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@af10ab75b6181b2803f051f802a5eff37bdbbe1b
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@6ccd41a989923f0db6108aea333c62d3fb8dedc1
         with:
           shell: powershell
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@af10ab75b6181b2803f051f802a5eff37bdbbe1b
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@6ccd41a989923f0db6108aea333c62d3fb8dedc1
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@af10ab75b6181b2803f051f802a5eff37bdbbe1b
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@6ccd41a989923f0db6108aea333c62d3fb8dedc1
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -85,7 +85,7 @@ jobs:
           useGhTokenWorkflowForPush: '${{ github.event.inputs.useGhTokenWorkflow }}'
 
       - name: Creating a new test app
-        uses: StefanMaron/AL-Go/Actions/CreateApp@af10ab75b6181b2803f051f802a5eff37bdbbe1b
+        uses: StefanMaron/AL-Go/Actions/CreateApp@6ccd41a989923f0db6108aea333c62d3fb8dedc1
         with:
           shell: powershell
           token: ${{ steps.ReadSecrets.outputs.TokenForPush }}
@@ -100,7 +100,7 @@ jobs:
 
       - name: Finalize the workflow
         if: always()
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@af10ab75b6181b2803f051f802a5eff37bdbbe1b
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@6ccd41a989923f0db6108aea333c62d3fb8dedc1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
