@@ -31,7 +31,7 @@ jobs:
     if: (github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name) && (github.event_name != 'pull_request')
     runs-on: windows-latest
     steps:
-      - uses: StefanMaron/AL-Go/Actions/VerifyPRChanges@197259bb29d498befc09af3774824a48e2d214f1
+      - uses: StefanMaron/AL-Go/Actions/VerifyPRChanges@b36a0544a4758c11ae74ed97974ae221fec3ce33
 
   Initialization:
     needs: [ PregateCheck ]
@@ -49,7 +49,7 @@ jobs:
       trackALAlertsInGitHub: ${{ steps.SetALCodeAnalysisVar.outputs.trackALAlertsInGitHub }}
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@197259bb29d498befc09af3774824a48e2d214f1
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@b36a0544a4758c11ae74ed97974ae221fec3ce33
         with:
           shell: powershell
 
@@ -61,13 +61,13 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@197259bb29d498befc09af3774824a48e2d214f1
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@b36a0544a4758c11ae74ed97974ae221fec3ce33
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@197259bb29d498befc09af3774824a48e2d214f1
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@b36a0544a4758c11ae74ed97974ae221fec3ce33
         with:
           shell: powershell
           get: shortLivedArtifactsRetentionDays,trackALAlertsInGitHub
@@ -86,10 +86,11 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@197259bb29d498befc09af3774824a48e2d214f1
+        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@b36a0544a4758c11ae74ed97974ae221fec3ce33
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
+          supportsLinuxFastLane: true
 
       # Third-party (appDependencyProbingPaths) dependency .apps for Linux fast lane projects, downloaded by
       # DetermineProjectsToBuild above into LinuxFastLaneDependencies_staging/<project>/. bc-test-from-source.yml can't see the
@@ -176,7 +177,7 @@ jobs:
       - name: Process AL Code Analysis Logs
         id: ProcessALCodeAnalysisLogs
         if: (success() || failure())
-        uses: StefanMaron/AL-Go/Actions/ProcessALCodeAnalysisLogs@197259bb29d498befc09af3774824a48e2d214f1
+        uses: StefanMaron/AL-Go/Actions/ProcessALCodeAnalysisLogs@b36a0544a4758c11ae74ed97974ae221fec3ce33
         with:
           shell: powershell
 
@@ -197,7 +198,7 @@ jobs:
     steps:
       - name: Pull Request Status Check
         id: PullRequestStatusCheck
-        uses: StefanMaron/AL-Go/Actions/PullRequestStatusCheck@197259bb29d498befc09af3774824a48e2d214f1
+        uses: StefanMaron/AL-Go/Actions/PullRequestStatusCheck@b36a0544a4758c11ae74ed97974ae221fec3ce33
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -205,7 +206,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@197259bb29d498befc09af3774824a48e2d214f1
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@b36a0544a4758c11ae74ed97974ae221fec3ce33
         if: success() || failure()
         env:
           GITHUB_TOKEN: ${{ github.token }}
