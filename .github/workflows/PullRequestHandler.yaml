@@ -31,7 +31,7 @@ jobs:
     if: (github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name) && (github.event_name != 'pull_request')
     runs-on: windows-latest
     steps:
-      - uses: StefanMaron/AL-Go/Actions/VerifyPRChanges@77332d73c0c10405108e1f27ccad7b202ac45e0e
+      - uses: StefanMaron/AL-Go/Actions/VerifyPRChanges@197259bb29d498befc09af3774824a48e2d214f1
 
   Initialization:
     needs: [ PregateCheck ]
@@ -49,7 +49,7 @@ jobs:
       trackALAlertsInGitHub: ${{ steps.SetALCodeAnalysisVar.outputs.trackALAlertsInGitHub }}
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@77332d73c0c10405108e1f27ccad7b202ac45e0e
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@197259bb29d498befc09af3774824a48e2d214f1
         with:
           shell: powershell
 
@@ -61,13 +61,13 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@77332d73c0c10405108e1f27ccad7b202ac45e0e
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@197259bb29d498befc09af3774824a48e2d214f1
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@77332d73c0c10405108e1f27ccad7b202ac45e0e
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@197259bb29d498befc09af3774824a48e2d214f1
         with:
           shell: powershell
           get: shortLivedArtifactsRetentionDays,trackALAlertsInGitHub
@@ -86,7 +86,7 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@77332d73c0c10405108e1f27ccad7b202ac45e0e
+        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@197259bb29d498befc09af3774824a48e2d214f1
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
@@ -176,7 +176,7 @@ jobs:
       - name: Process AL Code Analysis Logs
         id: ProcessALCodeAnalysisLogs
         if: (success() || failure())
-        uses: StefanMaron/AL-Go/Actions/ProcessALCodeAnalysisLogs@77332d73c0c10405108e1f27ccad7b202ac45e0e
+        uses: StefanMaron/AL-Go/Actions/ProcessALCodeAnalysisLogs@197259bb29d498befc09af3774824a48e2d214f1
         with:
           shell: powershell
 
@@ -197,7 +197,7 @@ jobs:
     steps:
       - name: Pull Request Status Check
         id: PullRequestStatusCheck
-        uses: StefanMaron/AL-Go/Actions/PullRequestStatusCheck@77332d73c0c10405108e1f27ccad7b202ac45e0e
+        uses: StefanMaron/AL-Go/Actions/PullRequestStatusCheck@197259bb29d498befc09af3774824a48e2d214f1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -205,7 +205,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@77332d73c0c10405108e1f27ccad7b202ac45e0e
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@197259bb29d498befc09af3774824a48e2d214f1
         if: success() || failure()
         env:
           GITHUB_TOKEN: ${{ github.token }}
