@@ -77,6 +77,16 @@ on:
         description: JSON formatted needs context
         type: string
         default: '{}'
+      artifact:
+        description: BC artifact URL for this project, centrally resolved by the Initialization job's DetermineProjectsToBuild step. Empty if it couldn't be resolved there, in which case this workflow resolves it itself as a fallback.
+        required: false
+        default: ''
+        type: string
+      artifactCacheKey:
+        description: Cache key for the Cache Business Central Artifacts step, matching the centrally-resolved artifact input. Empty if artifact is empty.
+        required: false
+        default: ''
+        type: string
 
 permissions:
   actions: read
@@ -104,16 +114,16 @@ jobs:
           lfs: true
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
           buildMode: ${{ inputs.buildMode }}
-          get: useCompilerFolder,workspaceCompilation,keyVaultCodesignCertificateName,doNotSignApps,doNotRunTests,doNotRunBcptTests,doNotRunpageScriptingTests,artifact,generateDependencyArtifact,trustedSigning,useGitSubmodules,trackALAlertsInGitHub,skipUpgrade
+          get: useCompilerFolder,workspaceCompilation,keyVaultCodesignCertificateName,doNotSignApps,doNotRunTests,doNotRunBcptTests,doNotRunpageScriptingTests,doNotPublishApps,artifact,generateDependencyArtifact,trustedSigning,useGitSubmodules,trackALAlertsInGitHub,skipUpgrade
 
       - name: Run Build Initialize hook
         if: hashFiles(format('{0}/.AL-Go/BuildInitialize.ps1', inputs.project)) != ''
-        uses: StefanMaron/AL-Go/Actions/RunHook@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/RunHook@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -121,7 +131,7 @@ jobs:
 
       - name: Determine whether to build project
         id: DetermineBuildProject
-        uses: StefanMaron/AL-Go/Actions/DetermineBuildProject@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/DetermineBuildProject@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           skippedProjectsJson: ${{ inputs.skippedProjectsJson }}
@@ -131,7 +141,7 @@ jobs:
       - name: Read secrets
         id: ReadSecrets
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True'
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -146,10 +156,18 @@ jobs:
           submodules: ${{ env.useGitSubmodules }}
           token: '${{ fromJson(steps.ReadSecrets.outputs.Secrets).gitSubmodulesToken }}'
 
+      - name: Use centrally-resolved ArtifactUrl
+        id: useCentrallyResolvedArtifactUrl
+        if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && inputs.artifact != ''
+        shell: ${{ inputs.shell }}
+        run: |
+          Add-Content -Encoding UTF8 -Path $env:GITHUB_ENV -Value "artifact=${{ inputs.artifact }}"
+          Add-Content -Encoding UTF8 -Path $env:GITHUB_ENV -Value "artifactCacheKey=${{ inputs.artifactCacheKey }}"
+
       - name: Determine ArtifactUrl
         id: determineArtifactUrl
-        if: steps.DetermineBuildProject.outputs.BuildIt == 'True'
-        uses: StefanMaron/AL-Go/Actions/DetermineArtifactUrl@0f56739893d2cc488b91979145e2cbf1814d13f0
+        if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && inputs.artifact == ''
+        uses: StefanMaron/AL-Go/Actions/DetermineArtifactUrl@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -164,7 +182,7 @@ jobs:
       - name: Download Project Dependencies
         id: DownloadProjectDependencies
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True'
-        uses: StefanMaron/AL-Go/Actions/DownloadProjectDependencies@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/DownloadProjectDependencies@4ac68370c65176ede8e33b571fca76835156ec33
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -177,14 +195,14 @@ jobs:
       - name: Download Previous Release
         id: DownloadPreviousRelease
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && env.skipUpgrade == 'False'
-        uses: StefanMaron/AL-Go/Actions/DownloadPreviousRelease@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/DownloadPreviousRelease@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
 
       - name: Compile Apps
         id: compile
-        uses: StefanMaron/AL-Go/Actions/CompileApps@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/CompileApps@4ac68370c65176ede8e33b571fca76835156ec33
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && fromJson(env.workspaceCompilation).enabled == true
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
@@ -210,9 +228,14 @@ jobs:
           [System.IO.File]::WriteAllText($needsContextPath, $nc.Trim())
           Add-Content -Encoding UTF8 -Path $env:GITHUB_ENV -Value "NeedsContext=$needsContextPath"
 
+      # Skipped for workspace-compiled, compile-only projects: RunPipeline.ps1 itself no-ops
+      # in that case (workspaceCompilation.enabled && doNotPublishApps - nothing to publish or
+      # test, Compile Apps above already produced the .app files), but only after
+      # DownloadAndImportBcContainerHelper has run - which is most of this step's cost. Skipping
+      # the step itself avoids importing BcContainerHelper at all when it would do nothing.
       - name: Build
-        uses: StefanMaron/AL-Go/Actions/RunPipeline@0f56739893d2cc488b91979145e2cbf1814d13f0
-        if: steps.DetermineBuildProject.outputs.BuildIt == 'True'
+        uses: StefanMaron/AL-Go/Actions/RunPipeline@4ac68370c65176ede8e33b571fca76835156ec33
+        if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && !(fromJson(env.workspaceCompilation).enabled == true && env.doNotPublishApps == 'True')
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
           BuildMode: ${{ inputs.buildMode }}
@@ -231,7 +254,7 @@ jobs:
       - name: Sign
         id: sign
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && inputs.signArtifacts && env.doNotSignApps == 'False' && (env.keyVaultCodesignCertificateName != '' || (fromJson(env.trustedSigning).Endpoint != '' && fromJson(env.trustedSigning).Account != '' && fromJson(env.trustedSigning).CertificateProfile != '')) && (hashFiles(format('{0}/.buildartifacts/Apps/*.app',inputs.project)) != '')
-        uses: StefanMaron/AL-Go/Actions/Sign@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/Sign@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           azureCredentialsJson: '${{ fromJson(steps.ReadSecrets.outputs.Secrets).AZURE_CREDENTIALS }}'
@@ -239,7 +262,7 @@ jobs:
 
       - name: Calculate Artifact names
         id: calculateArtifactsNames
-        uses: StefanMaron/AL-Go/Actions/CalculateArtifactNames@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/CalculateArtifactNames@4ac68370c65176ede8e33b571fca76835156ec33
         if: success() || failure()
         with:
           shell: ${{ inputs.shell }}
@@ -354,7 +377,7 @@ jobs:
       - name: Analyze Test Results
         id: analyzeTestResults
         if: (success() || failure()) && env.doNotRunTests == 'False'
-        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -363,7 +386,7 @@ jobs:
       - name: Analyze BCPT Test Results
         id: analyzeTestResultsBCPT
         if: (success() || failure()) && env.doNotRunBcptTests == 'False'
-        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -372,7 +395,7 @@ jobs:
       - name: Analyze Page Scripting Test Results
         id: analyzeTestResultsPageScripting
         if: (success() || failure()) && env.doNotRunpageScriptingTests == 'False'
-        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -380,7 +403,7 @@ jobs:
 
       - name: Cleanup
         if: always() && steps.DetermineBuildProject.outputs.BuildIt == 'True'
-        uses: StefanMaron/AL-Go/Actions/PipelineCleanup@0f56739893d2cc488b91979145e2cbf1814d13f0
+        uses: StefanMaron/AL-Go/Actions/PipelineCleanup@4ac68370c65176ede8e33b571fca76835156ec33
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
