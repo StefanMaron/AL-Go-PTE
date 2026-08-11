@@ -65,14 +65,14 @@ jobs:
           lfs: true
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@4ac68370c65176ede8e33b571fca76835156ec33
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@ab9bd11883951f39c7c7f75a4a586d07029d3e21
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
           get: type,powerPlatformSolutionFolder,appRevision,appBuild
 
       - name: Build
-        uses: StefanMaron/AL-Go/Actions/BuildPowerPlatform@4ac68370c65176ede8e33b571fca76835156ec33
+        uses: StefanMaron/AL-Go/Actions/BuildPowerPlatform@ab9bd11883951f39c7c7f75a4a586d07029d3e21
         with:
           shell: ${{ inputs.shell }}
           solutionFolder: ${{ inputs.project }}
@@ -83,7 +83,7 @@ jobs:
 
       - name: Calculate Artifact names
         id: calculateArtifactsNames
-        uses: StefanMaron/AL-Go/Actions/CalculateArtifactNames@4ac68370c65176ede8e33b571fca76835156ec33
+        uses: StefanMaron/AL-Go/Actions/CalculateArtifactNames@ab9bd11883951f39c7c7f75a4a586d07029d3e21
         if: success() || failure()
         with:
           shell: ${{ inputs.shell }}
