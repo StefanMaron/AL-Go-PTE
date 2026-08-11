@@ -1,4 +1,12 @@
-## main
+## test/symbols-from-nuget
+
+### New `symbolsSource` setting - build against symbols from NuGet instead of an artifact
+
+When compiling without a container, AL-Go builds a compiler folder from a Business Central artifact: ~2.2 GB of zips extracting to ~3.1 GB, of which a compile uses a few megabytes. Setting `symbolsSource: nuGet` (alongside `workspaceCompilation`) populates that folder from Microsoft's public NuGet feeds instead - the symbols your apps actually depend on from the MSSymbols feed, and the AL compiler and analyzers from nuget.org. That is ~23 MB downloaded rather than ~2.2 GB, and no artifact is fetched at all.
+
+The version and country still come from the resolved `artifact` setting, so pinning `artifact` keeps pinning what you compile against, and `vsixFile` still selects the compiler (`default` matches your Business Central version, `latest` and `preview` behave as before). Microsoft dependencies declared in your app.json files - the test toolkit for a test app, for instance - are resolved from the same feed, so only what a project needs is staged.
+
+`nuGet` is not supported for apps targeting `OnPrem` or `Internal`, which may use .NET interop: the NuGet feeds carry no service tier assemblies. Those builds fail up front with a message pointing back to `artifact`. Default is `artifact`, so nothing changes unless you opt in. See [Scenarios/SymbolsFromNuGet.md](Scenarios/SymbolsFromNuGet.md).
 
 ### New `linuxFastLane` setting - fast pull request builds on Linux BC
 
