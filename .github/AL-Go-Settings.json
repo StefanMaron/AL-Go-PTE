@@ -1,5 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/StefanMaron/AL-Go/Actions/6ccd41a989923f0db6108aea333c62d3fb8dedc1/.Modules/settings.schema.json",
   "type": "PTE",
-  "templateUrl": "https://github.com/StefanMaron/AL-Go-PTE@main"
+  "templateUrl": "https://github.com/StefanMaron/AL-Go-PTE@test/symbols-nuget-plus-linuxfix"
 }
