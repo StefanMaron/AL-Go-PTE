@@ -71,14 +71,14 @@ jobs:
 
       - name: Read settings
         id: ReadSettings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@97afa0914f7ee74816c141e3b06f3249b1a2752d
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@cb640dfea359e491d2dba8eefbb1fd5084bd5091
         with:
           shell: powershell
           get: templateUrl
 
       - name: Get Workflow Multi-Run Branches
         id: GetBranches
-        uses: StefanMaron/AL-Go/Actions/GetWorkflowMultiRunBranches@97afa0914f7ee74816c141e3b06f3249b1a2752d
+        uses: StefanMaron/AL-Go/Actions/GetWorkflowMultiRunBranches@cb640dfea359e491d2dba8eefbb1fd5084bd5091
         with:
           shell: powershell
           workflowEventName: ${{ env.WorkflowEventName }}
@@ -108,7 +108,7 @@ jobs:
 
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@97afa0914f7ee74816c141e3b06f3249b1a2752d
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@cb640dfea359e491d2dba8eefbb1fd5084bd5091
         with:
           shell: powershell
 
@@ -119,19 +119,19 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@97afa0914f7ee74816c141e3b06f3249b1a2752d
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@cb640dfea359e491d2dba8eefbb1fd5084bd5091
         with:
           shell: powershell
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@97afa0914f7ee74816c141e3b06f3249b1a2752d
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@cb640dfea359e491d2dba8eefbb1fd5084bd5091
         with:
           shell: powershell
           get: commitOptions
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@97afa0914f7ee74816c141e3b06f3249b1a2752d
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@cb640dfea359e491d2dba8eefbb1fd5084bd5091
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -158,7 +158,7 @@ jobs:
           Add-Content -Encoding UTF8 -Path $env:GITHUB_ENV -Value "downloadLatest=$downloadLatest"
 
       - name: Update AL-Go system files
-        uses: StefanMaron/AL-Go/Actions/CheckForUpdates@97afa0914f7ee74816c141e3b06f3249b1a2752d
+        uses: StefanMaron/AL-Go/Actions/CheckForUpdates@cb640dfea359e491d2dba8eefbb1fd5084bd5091
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -172,7 +172,7 @@ jobs:
 
       - name: Finalize the workflow
         if: always()
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@97afa0914f7ee74816c141e3b06f3249b1a2752d
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@cb640dfea359e491d2dba8eefbb1fd5084bd5091
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
