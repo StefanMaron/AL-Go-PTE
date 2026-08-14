@@ -38,7 +38,7 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@9fa9b9cd22d88e44e6e5efefcff9716655830ef2
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@891c20e098220d1a62ff8a53848ad93bda196994
         with:
           shell: powershell
 
@@ -51,14 +51,14 @@ jobs:
           Add-Content -encoding utf8 -Path $env:GITHUB_ENV -Value "envName=$envName"
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@9fa9b9cd22d88e44e6e5efefcff9716655830ef2
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@891c20e098220d1a62ff8a53848ad93bda196994
         with:
           shell: powershell
           get: powerPlatformSolutionFolder
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@9fa9b9cd22d88e44e6e5efefcff9716655830ef2
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@891c20e098220d1a62ff8a53848ad93bda196994
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -67,7 +67,7 @@ jobs:
 
       - name: Determine Deployment Environments
         id: DetermineDeploymentEnvironments
-        uses: StefanMaron/AL-Go/Actions/DetermineDeploymentEnvironments@9fa9b9cd22d88e44e6e5efefcff9716655830ef2
+        uses: StefanMaron/AL-Go/Actions/DetermineDeploymentEnvironments@891c20e098220d1a62ff8a53848ad93bda196994
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -89,7 +89,7 @@ jobs:
           Add-Content -encoding utf8 -Path $env:GITHUB_ENV -Value "solutionFolder=$solutionFolder"
 
       - name: Pull changes from Power Platform environment
-        uses: StefanMaron/AL-Go/Actions/PullPowerPlatformChanges@9fa9b9cd22d88e44e6e5efefcff9716655830ef2
+        uses: StefanMaron/AL-Go/Actions/PullPowerPlatformChanges@891c20e098220d1a62ff8a53848ad93bda196994
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -102,7 +102,7 @@ jobs:
 
       - name: Finalize the workflow
         if: always()
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@9fa9b9cd22d88e44e6e5efefcff9716655830ef2
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@891c20e098220d1a62ff8a53848ad93bda196994
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
