@@ -31,7 +31,7 @@ jobs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
 
@@ -42,13 +42,13 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           get: useGitSubmodules,shortLivedArtifactsRetentionDays
@@ -56,7 +56,7 @@ jobs:
       - name: Read submodules token
         id: ReadSubmodulesToken
         if: env.useGitSubmodules != 'false' && env.useGitSubmodules != ''
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -78,14 +78,14 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
 
   Build:
     needs: [ Initialization ]
-    if: (!failure()) && (!cancelled()) && fromJson(needs.Initialization.outputs.buildOrderJson)[0].projectsCount > 0
+    if: (!failure()) && (!cancelled()) && fromJson(needs.Initialization.outputs.buildOrderJson)[0].buildDimensionsCount > 0
     strategy:
       matrix:
         include: ${{ fromJson(needs.Initialization.outputs.buildOrderJson)[0].buildDimensions }}
@@ -117,7 +117,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@5986d02126adacc853682214a7ab6e7c458a69fd
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:

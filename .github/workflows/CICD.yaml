@@ -51,7 +51,7 @@ jobs:
       trackALAlertsInGitHub: ${{ steps.SetALCodeAnalysisVar.outputs.trackALAlertsInGitHub }}
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
 
@@ -62,13 +62,13 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           get: type,powerPlatformSolutionFolder,useGitSubmodules,trackALAlertsInGitHub
@@ -82,7 +82,7 @@ jobs:
       - name: Read submodules token
         id: ReadSubmodulesToken
         if: env.useGitSubmodules != 'false' && env.useGitSubmodules != ''
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -103,7 +103,7 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DetermineProjectsToBuild@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
@@ -130,7 +130,7 @@ jobs:
 
       - name: Determine Delivery Target Secrets
         id: DetermineDeliveryTargetSecrets
-        uses: StefanMaron/AL-Go/Actions/DetermineDeliveryTargets@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DetermineDeliveryTargets@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           projectsJson: '${{ steps.determineProjectsToBuild.outputs.ProjectsJson }}'
@@ -138,7 +138,7 @@ jobs:
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -146,7 +146,7 @@ jobs:
 
       - name: Determine Delivery Targets
         id: DetermineDeliveryTargets
-        uses: StefanMaron/AL-Go/Actions/DetermineDeliveryTargets@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DetermineDeliveryTargets@5986d02126adacc853682214a7ab6e7c458a69fd
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -156,7 +156,7 @@ jobs:
 
       - name: Determine Deployment Environments
         id: DetermineDeploymentEnvironments
-        uses: StefanMaron/AL-Go/Actions/DetermineDeploymentEnvironments@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DetermineDeploymentEnvironments@5986d02126adacc853682214a7ab6e7c458a69fd
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -172,21 +172,21 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           get: templateUrl
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
           getSecrets: 'ghTokenWorkflow'
 
       - name: Check for updates to AL-Go system files
-        uses: StefanMaron/AL-Go/Actions/CheckForUpdates@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/CheckForUpdates@5986d02126adacc853682214a7ab6e7c458a69fd
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -197,7 +197,7 @@ jobs:
 
   Build:
     needs: [ Initialization ]
-    if: (!failure()) && (!cancelled()) && fromJson(needs.Initialization.outputs.buildOrderJson)[0].projectsCount > 0
+    if: (!failure()) && (!cancelled()) && fromJson(needs.Initialization.outputs.buildOrderJson)[0].buildDimensionsCount > 0
     strategy:
       matrix:
         include: ${{ fromJson(needs.Initialization.outputs.buildOrderJson)[0].buildDimensions }}
@@ -269,7 +269,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: pwsh
 
@@ -282,7 +282,7 @@ jobs:
 
       - name: Calculate Artifact names
         id: calculateArtifactsNames
-        uses: StefanMaron/AL-Go/Actions/CalculateArtifactNames@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/CalculateArtifactNames@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: pwsh
           project: ${{ matrix.project }}
@@ -340,7 +340,7 @@ jobs:
       - name: Process AL Code Analysis Logs
         id: ProcessALCodeAnalysisLogs
         if: (success() || failure())
-        uses: StefanMaron/AL-Go/Actions/ProcessALCodeAnalysisLogs@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ProcessALCodeAnalysisLogs@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
 
@@ -376,13 +376,13 @@ jobs:
           path: '.artifacts'
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
 
       - name: Determine ArtifactUrl
         id: determineArtifactUrl
-        uses: StefanMaron/AL-Go/Actions/DetermineArtifactUrl@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DetermineArtifactUrl@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
 
@@ -391,7 +391,7 @@ jobs:
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
       - name: Build Reference Documentation
-        uses: StefanMaron/AL-Go/Actions/BuildReferenceDocumentation@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/BuildReferenceDocumentation@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           artifacts: '.artifacts'
@@ -434,7 +434,7 @@ jobs:
           path: '.artifacts'
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: ${{ matrix.shell }}
           get: type,powerPlatformSolutionFolder
@@ -448,7 +448,7 @@ jobs:
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: ${{ matrix.shell }}
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -456,7 +456,7 @@ jobs:
 
       - name: Deploy to Business Central
         id: Deploy
-        uses: StefanMaron/AL-Go/Actions/Deploy@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/Deploy@5986d02126adacc853682214a7ab6e7c458a69fd
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -468,7 +468,7 @@ jobs:
 
       - name: Deploy to Power Platform
         if: env.type == 'PTE' && env.powerPlatformSolutionFolder != ''
-        uses: StefanMaron/AL-Go/Actions/DeployPowerPlatform@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/DeployPowerPlatform@5986d02126adacc853682214a7ab6e7c458a69fd
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -498,20 +498,20 @@ jobs:
           path: '.artifacts'
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@5986d02126adacc853682214a7ab6e7c458a69fd
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
           getSecrets: '${{ matrix.deliveryTarget }}Context'
 
       - name: Deliver
-        uses: StefanMaron/AL-Go/Actions/Deliver@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/Deliver@5986d02126adacc853682214a7ab6e7c458a69fd
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -531,7 +531,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@891c20e098220d1a62ff8a53848ad93bda196994
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@5986d02126adacc853682214a7ab6e7c458a69fd
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
