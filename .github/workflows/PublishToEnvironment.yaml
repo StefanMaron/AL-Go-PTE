@@ -42,7 +42,7 @@ jobs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@d91f39f405b84afe6e59591dc6b98807150aa5ba
         with:
           shell: powershell
 
@@ -51,19 +51,19 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@d91f39f405b84afe6e59591dc6b98807150aa5ba
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@d91f39f405b84afe6e59591dc6b98807150aa5ba
         with:
           shell: powershell
 
       - name: Determine Deployment Environments
         id: DetermineDeploymentEnvironments
-        uses: StefanMaron/AL-Go/Actions/DetermineDeploymentEnvironments@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/DetermineDeploymentEnvironments@d91f39f405b84afe6e59591dc6b98807150aa5ba
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -82,7 +82,7 @@ jobs:
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@d91f39f405b84afe6e59591dc6b98807150aa5ba
         if: steps.DetermineDeploymentEnvironments.outputs.UnknownEnvironment == 1
         with:
           shell: powershell
@@ -114,7 +114,7 @@ jobs:
             Write-Host "No AuthContext provided for $envName, initiating Device Code flow"
             $ALGoHelperPath = "$([System.IO.Path]::GetTempFileName()).ps1"
             $webClient = New-Object System.Net.WebClient
-            $webClient.DownloadFile('https://raw.githubusercontent.com/StefanMaron/AL-Go/Actions/328e695668c1584ee8cb832fe61c5aa0597fdbb5/AL-Go-Helper.ps1', $ALGoHelperPath)
+            $webClient.DownloadFile('https://raw.githubusercontent.com/StefanMaron/AL-Go/Actions/d91f39f405b84afe6e59591dc6b98807150aa5ba/AL-Go-Helper.ps1', $ALGoHelperPath)
             . $ALGoHelperPath
             DownloadAndImportBcContainerHelper
             $authContext = New-BcAuthContext -includeDeviceLogin -deviceLoginTimeout ([TimeSpan]::FromSeconds(0))
@@ -150,21 +150,21 @@ jobs:
           Add-Content -Encoding UTF8 -Path $env:GITHUB_OUTPUT -Value "envName=$envName"
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@d91f39f405b84afe6e59591dc6b98807150aa5ba
         with:
           shell: ${{ matrix.shell }}
           get: type,powerPlatformSolutionFolder
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@d91f39f405b84afe6e59591dc6b98807150aa5ba
         with:
           shell: ${{ matrix.shell }}
           gitHubSecrets: ${{ toJson(secrets) }}
           getSecrets: '${{ steps.envName.outputs.envName }}-AuthContext,${{ steps.envName.outputs.envName }}_AuthContext,AuthContext'
 
       - name: Get Artifacts for deployment
-        uses: StefanMaron/AL-Go/Actions/GetArtifactsForDeployment@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/GetArtifactsForDeployment@d91f39f405b84afe6e59591dc6b98807150aa5ba
         with:
           shell: ${{ matrix.shell }}
           artifactsVersion: ${{ github.event.inputs.appVersion }}
@@ -173,7 +173,7 @@ jobs:
 
       - name: Deploy to Business Central
         id: Deploy
-        uses: StefanMaron/AL-Go/Actions/Deploy@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/Deploy@d91f39f405b84afe6e59591dc6b98807150aa5ba
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -186,7 +186,7 @@ jobs:
 
       - name: Deploy to Power Platform
         if: env.type == 'PTE' && env.powerPlatformSolutionFolder != ''
-        uses: StefanMaron/AL-Go/Actions/DeployPowerPlatform@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/DeployPowerPlatform@d91f39f405b84afe6e59591dc6b98807150aa5ba
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -205,7 +205,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@328e695668c1584ee8cb832fe61c5aa0597fdbb5
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@d91f39f405b84afe6e59591dc6b98807150aa5ba
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
