@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/StefanMaron/AL-Go/Actions/5986d02126adacc853682214a7ab6e7c458a69fd/.Modules/settings.schema.json",
+  "$schema": "https://raw.githubusercontent.com/StefanMaron/AL-Go/Actions/63c3ddbd813e9c03f04cecc93e238efe3d1502dd/.Modules/settings.schema.json",
   "type": "PTE",
   "templateUrl": "https://github.com/StefanMaron/AL-Go-PTE@main"
 }
